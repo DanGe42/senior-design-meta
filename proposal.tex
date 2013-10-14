@@ -48,16 +48,26 @@ this data to build a map of the network topology. The basic unit of data
 transmitted by this protocol is a LLDP Protocol Data Unit (PDU). A LLDP PDU
 consists of a header followed by elements known as TLVs (Type, Length, Value).
 
-\textbf{NetFlow} is a protocol used for collecting and analyzing network
-traffic. On a high level, a flow is a series of packets that are similar to each
-other. More specifically, we will be working with Cisco's Version 5 and Version
-9 flow records where a flow is defined by source IP address, destination IP
-address, source port number, destination port number, layer 3 protocol type, ToS
-byte, and input logical interface. Each flow consists of a flow header, which
-contains information such as Netflow version and number of records, and flow
-records, which contains information such as source and destination IP, bytes,
-and IP protocol. Netflow is sent from routers and switches to a collector
-machine where it can be stored, exported, and/or used for analysis.
+\textbf{NetFlow} is a protocol used for collecting IP traffic information. On a
+high level, a flow is a series of packets that are similar to each other. More
+specifically, Cisco's Version 5 and Version 9 flow records define a flow by
+source IP address, destination IP address, source port number, destination port
+number, layer 3 protocol type, ToS byte, and input logical interface. Each flow
+consists of a flow header, which contains information such as Netflow version
+and number of records, and flow records, which contains information such as
+source and destination IP, bytes, and IP protocol. Netflow is sent from routers
+and switches to a collector machine where it can be stored, exported, and/or
+used for analysis.
+
+\textbf{Simple Network Management Protocol (SNMP)} is a protocol that helps
+exchange information about a network between the devices in the network. The
+basic setup of an SNMP-managed network consists of managed devices, agents, and
+network-management systems. Managed devices run SNMP agents (software) and store
+information which can be accessed via SNMP by the network-management system
+through a query. It is important to note that SNMP doesn’t define the
+information that is stored on managed devices and accessed by the
+network-management system. Defining the management information is the job of a
+database known as the management information base.
 
 \section{Introduction}
 
@@ -170,22 +180,19 @@ real-time.
 
 \section{Proposed work}
 
-The architecture of the application can be broken down into 3 main components: a
-module that collects netflow data from the network, network data processing and
-storage within the cloud (most likely AWS), and a web front end to all of the
-processed data.
+\subsection{Overview}
 
-The first challenge we anticipate is simply the sheer volume of the LLDP data
-(and eventually Netflow if time is permitting) the collector will need to
-collect and transfer over to the data processor in the cloud. This volume could
-easily reach the scale of terabytes if collected for long enough. We will devise
-a way to take this volume of data and stream it to the processing cluster in the
-cloud. Transferring this high volume of data to a cloud service could be
-potentially costly so we will need to consider ways to keep this cost low and
-transfer the data efficiently. If we reach the point where we work with Netflow
-data we must address security and privacy concerns with this collection. Most
-likely we will need to anonymize the network data before we send it over to the
-data processor.
+The point of our project is to create a system which will be able to analyze
+network data, not only in an aggregation fashion, but also in terms of
+extrapolation. In addition, we aim to display the network data in a user
+friendly, yet descriptive way. The architecture of the application can be broken
+down into 3 main components. First, we will have a module that collects and
+stores data from a network. Second, this data will be passed to the cloud to be
+processed and interpreted. Third, the calculated statistics and information will
+be displayed on a clean, interactive web front end. The end goal is to run our
+system on the constant stream of information provided by a living network, and
+we hope to make the system real-time, or as close to real-time as is possible
+using our tools.
 
 \begin{figure}[htb!]
     \centering
@@ -194,24 +201,138 @@ data processor.
     \label{fig:mockup}
 \end{figure}
 
-Within the cloud we will host the data processing module (likely using Hadoop or
-another horizontally scalable data processing framework). Within this module
-there are 3 main components (data processor, index to stored data, and server
-for web application). The data processor will apply the necessary aggregations
-to make the data set manageable for later indexing (We are looking to apply more
-sophisticated analysis on the data if time permits). All this data will be
-stored in an easily accessible and queryable database (likely some form of a SQL
-database or a distributed SQL database if the data set is large) so the web
-frontend server can query it when rendering HTML pages. The web server will
-serve the frontend application to the requesting user.
+\subsection{Techniques}
 
-For the web front end we will provide the user a clear and insightful view into
-the network data. We will use modern web UI frameworks that leverage HTML, CSS,
-and JS so that this application will look consistent among multiple platforms.
+We will collect LLDP data, information from SNMP, and hopefully (time
+permitting) Netflow data from the Penn Engineering network. This information
+must then be transferred to our data processing tools in the cloud. For this to
+be possible, we must move the data to a cloud storage base (such as S3 on AWS)
+in order to use a horizontally scalable data processing system to extract
+aggregate network data.
+
+Once the data has entered the cloud, there are 3 main steps our software will
+take to prepare the data for the user. First comes the previously mentioned data
+processor. This data processor will take advantage of distributed systems to
+make calculations and aggregations quickly. The most well known distributed tool
+within our group is Hadoop, so it is the most likely candidate for use in the
+analysis. Although Hadoop is a batch process tool, we hope to make real-time,
+“streamed” calculations of the data which we can simulated through frequent
+Hadoop jobs. The other option is to replace Hadoop entirely with another tool as
+we discuss in the next section.
+
+After that, we must create an index over the calculated data. All this data will
+be stored in an easily accessible and queryable database (likely some form of a
+SQL database or a distributed SQL database if the data set is large) so the web
+frontend server can query it when rendering HTML pages.
+
+Lastly, we must set up a server for the web application front end. For the web
+front end we will provide the user a clear and insightful view into the network
+data. We will use modern web UI frameworks that leverage HTML, CSS, and
+JavaScript so that the application will look consistent among multiple
+platforms. The most likely tool we will use for building the front end is the
+node.js framework. It is simple, modular, and extremely customizable due to the
+possible use of stylesheets.
+
+In order to coordinate the transfer of the data (collector to big data
+processor, database to server), it is necessary to use scheduler scripts. For
+the initial implementation it would make sense to have a cron job (period job
+scheduler) that runs on a EC2 instance that fires up instances for Map Reduce
+jobs (or another distributed data processing system) and a cron job running on
+the network data collector that schedules times for sending network data to a S3
+bucket. Later on we look to add synchronization with a fault tolerant job
+scheduler if this application scales out to more nodes. Chronos is a possible
+tool for distributed and fault tolerant job scheduling.
+
+\subsection{Anticipated technical challenges}
+
+The first challenge we anticipate is simply the sheer volume of the data we must
+aggregate and send to the cloud. This volume could easily reach the scale of
+terabytes if collected for long enough. We will devise a way to take this volume
+of data and stream it to the processing cluster in the cloud. Transferring this
+high volume of data to a cloud service could be potentially costly so we will
+need to consider ways to keep this cost low and transfer the data efficiently.
+Additionally, If we reach the point where we work with Netflow data we must
+address security and privacy concerns with this collection. Most likely we will
+need to anonymize the network data before we send it over to the data processor.
+
+Another challenge with the application is the real time implementation; each of
+the modules must be synchronized with each other. For example when is there
+enough data collected within the collector to be transferred to the Hadoop
+stream (or Storm, Spark, etc.)? Or what event will trigger the server to update
+the client of state change in the network? Improper implementation can easily
+result in modules getting stuck waiting for an update message that never
+arrived. Further compounding the difficulty of such an implementation is the
+possibility of failure of each modules. Amazon EC2 instances are time shared
+virtual machines that run on commodity hardware; we must account for possible
+service failure. Additionally it is possible that the collector process could
+run out of memory and stop streaming. It is essential to identify these errors
+as they occur and to automatically recover from them or to fail gracefully and
+not let errors further propagate.
+
+We are also unsure on what software to use specifically for our cloud analysis.
+Within our team, Hadoop is the best known tool at this time. But Hadoop runs
+batch processes, and will be harder to stream in a real time environment and
+involves large setup and shutdown delays. We have been looking at tools such as
+Spark, Storm, and Apache S4 in the hopes of finding a streamable distributed
+tool for better real-time updates while still keeping Hadoop's ease of use and
+fault tolerance.
+
+A summary of Summingbird, a tool recently manufactured by Twitter for compiling
+map reduce problems into either batch or real-time processes, outlines some of
+the tradeoffs and problems we will face with this choice. Although Storm
+(another of their tools) is faster and streamable, It sacrifices the fault
+tolerance of Hadoop's implementation as well as having different problems and
+bugs we will have to learn and deal with.
+
+Using information from Spark's official webpage, we can see some touted benefits
+for their system. They mention that their tool can be up to 100x faster than
+Hadoop implementations by using in memory computations. This could lead to its
+own problems as well though. So, although we are unsure of which to use, we will
+most likely start with the system we are most familiar with (Hadoop) and then
+prototype the system using the other options so we may compare the benefits and
+tradeoffs ourselves. This way, if one does not work, or any is clearly better
+than the others, we will be able to identify it, learn it, and use it.
+
+\subsection{Evaluation criteria}
+
+Our main criteria for evaluation involve the ease of usability and the ability
+to access important information on our software. We want someone with minimal
+knowledge of the specific network, or even networks in general, to be able to
+use the tool and still understand what we are portraying. We also of course want
+the tool to be useful for knowledgeable users. Our program should be able to
+display the same information as other applications on the market plus some in
+addition to its visual components.
+
+We also hope that our program will be able to detect and display anomalies to
+its users. The ultimate point of validation would be to see Penn's network
+administrators (or the administrators of another network) use the software and
+value it higher than what they currently use. Our end goal is to create an
+extensive tool for displaying network information with a highly user experience
+centric front end as we think this technology is currently unavailable.
 
 \section{Timetable}
 
-Milestones
+While it is difficult to predict with certainty all obstacles we will encounter
+in course of the project, we have laid out our preliminary timetable as follows:
+
+\begin{enumerate}
+    \item \textsc{October}: Receive LDDP, SNMP Data from Penn. Process it to
+        JSON-based graphs.
+    \item \textsc{November}: Write LLDP- and SNMP-crunching jobs with MapReduce.
+    \item \textsc{December}: Create basic front-end to display node format.
+    \item \textsc{January}: Prototype of router node graph and basic statistics
+        implemented for Penn.
+    \item \textsc{February}: Receive anonymized Netflow data from Penn,
+        determine analysis algorithms.
+    \item \textsc{March}: Convert analysis algorithms into MapReduce jobs,
+        combine with front-end.
+    \item \textsc{April}: Polish and test product, fully integrate with Penn's
+        network.
+\end{enumerate}
+
+If we progress through the project faster than we anticipate, we will attempt to
+make our reach goal of implementing algorithms to alert users of anomalous
+network activity.
 
 \bibliographystyle{plain}
 \bibliography{sources}
