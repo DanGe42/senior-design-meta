@@ -77,7 +77,7 @@ discover information such as percentage of traffic used by certain applications,
 which users use the network the most, how usage patterns have changed over time,
 and the geographic patterns of network connections. The usage of LLDP, SNMP, and
 Netflow data has emerged as a method to perform this analysis and tools such as
-NFSen have enabled visualization capabilities by enabling users to look at the
+NfSen have enabled visualization capabilities by enabling users to look at the
 data in a variety of forms such as logs, charts, and graphs.
 
 We believe that existing tools can be improved upon. Log files give extremely
@@ -93,10 +93,9 @@ We hope to create a network visualization tool that addresses these problems.
 Our tool will combine log, chart, and graph visualization methods to
 simultaneously offer users a high-level picture of the network and node-level
 detail in one workspace. To further enhance the analysis capabilities of users,
-we will also incorporate event detection to detect events such as traffic spikes
-and security threats to make our system proactive. These capabilities will be
-enhanced by performing the analysis in real-time and making our system web-based
-and multi-platform.
+we will also detect events such as traffic spikes and security threats, making
+our system proactive. These capabilities will be enhanced by performing the
+analysis in real-time and making our system web-based and multi-platform.
 
 \section{Related work}
 
@@ -120,12 +119,12 @@ graphs was not highlighted. In addition, it appears that LLDP and SNMP were not
 incorporated into the solarwinds software; we believe that by integrating
 multiple data sets, we can provide a more holistic picture of network health.
 
-Another tool we looked into was Nfsen, an open-source web-based NetFlow
+Another tool we looked into was NfSen, an open-source web-based NetFlow
 aggregator and analyzer.\cite{NfSen} It took raw NetFlow data from another
 open-source tool, nfdump, and visualized it onto a web interface. It solved the
 problem of cross-platform visualization, but the graphs are too high-level to be
 useful for anything other than knowing there was a problem. We spoke with the
-Penn system administrators, and they found nfsen to be useful only in detecting
+Penn system administrators, and they found NfSen to be useful only in detecting
 potential anomalies. From there, they used command tools and sometimes a
 multitude of other software platforms in order to understand the problem in
 detail. 
@@ -140,8 +139,8 @@ not use LDDP or SNMP in order to create and understand topology, and their user
 interface looked like it could use some improvement as the usage case was not
 entirely intuitive.
 
-In terms of work to understand campus wireless networks, we found that Kotz et
-al.\cite{Kotz05} used SNMP in order to understand macro-scale campus networks as
+In terms of work to understand campus wireless networks, we found that Kotz and
+Essien\cite{Kotz05} used SNMP in order to understand macro-scale campus networks as
 wireless was emerging in 2005. Although the research primarily investigated
 roaming across the network, which is not entirely relevant to our proposed work,
 their method of breaking down traffic across the network using SNMP is relevant.
@@ -174,25 +173,24 @@ with text-based tools. They found that with VISUAL, users could develop insights
 from the traffic data without any training, demonstrating the power of
 visualization tools. VISUAL's main features include markers for external and
 internal hosts, color-coded links between external and internal hosts,
-interactive filtering, and time lines. Shortcomings of VISUAL that we hope to
-address include more proactive displays (e.g. having an internal host flash red
-when there is a traffic spike) and processing network data in closer to
-real-time.
+interactive filtering, and time lines. We hope to improve on this by including
+more proactive displays (e.g. having an internal host flash red when there is a
+traffic spike) and processing network data closer to real-time.
 
 \section{Proposed work}
 
 \subsection{Overview}
 
-Our objective is to create a system which will be able to analyze network data,
-not only in an aggregation fashion, but also in terms of extrapolation. In
-addition, we aim to display the network data in a user friendly, yet descriptive
-way. The architecture of the application can be broken down into 3 main
-components. First, we will have a module that collects and stores data from a
-network. Second, this data will be passed to the cloud to be processed and
-interpreted. Third, the calculated statistics and information will be displayed
-on a clean, interactive web front end. The end goal is to run our system on the
-constant stream of information provided by a living network, and we hope to make
-the system real-time, or as close to real-time as is possible using our tools.
+Our objective is to create a system that can analyze network data in aggregate
+and to extrapolate meaningful results. In addition, we aim to display the
+network data in a user friendly, yet descriptive way. The architecture of the
+application can be broken down into three main components. First, we will have a
+module that collects and stores data from a network. Second, this data will be
+passed to the cloud to be processed and interpreted. Third, the calculated
+statistics and information will be displayed on a clean, interactive web front
+end. The end goal is to run our system on the constant stream of information
+provided by a living network, and we hope to make the system real-time, or as
+close to real-time as is possible using our tools.
 
 \begin{figure}[htb!]
     \centering
@@ -216,8 +214,8 @@ processor. This data processor will take advantage of distributed systems to
 make calculations and aggregations quickly. The most well known distributed tool
 within our group is Hadoop, so it is the most likely candidate for use in the
 analysis. Although Hadoop is a batch process tool, we hope to make real-time,
-``streamed'' calculations of the data which we can simulated through frequent
-Hadoop jobs. The other option is to replace Hadoop entirely with another tool as
+``streamed'' calculations of the data which we can simulate through frequent
+Hadoop jobs. The other option is to replace Hadoop entirely with other tools as
 we discuss in the next section.
 
 After that, we must create an index over the calculated data. All this data will
@@ -230,7 +228,7 @@ front end we will provide the user a clear and insightful view into the network
 data. We will use modern web UI frameworks that leverage HTML, CSS, and
 JavaScript so that the application will look consistent among multiple
 platforms. The most likely tool we will use for building the front end is the
-node.js framework. It is simple, modular, and extremely customizable due to the
+Node.js framework. It is simple, modular, and extremely customizable due to the
 possible use of stylesheets.
 
 In order to coordinate the transfer of the data (collector to big data
@@ -275,7 +273,7 @@ Additionally, If we reach the point where we work with Netflow data we must
 address security and privacy concerns with this collection. Most likely we will
 need to anonymize the network data before we send it over to the data processor.
 
-Another challenge with the application is the real time implementation; each of
+Another challenge with the application is the real-time implementation; each of
 the modules must be synchronized with each other. For example when is there
 enough data collected within the collector to be transferred to the Hadoop
 stream (or Storm, Spark, etc.)? Or what event will trigger the server to update
@@ -309,33 +307,32 @@ surface as we dive deeper into the implementation.
 
 We are also unsure on what software to use specifically for our cloud analysis.
 Within our team, Hadoop is the best known tool at this time. But Hadoop runs
-batch processes, and will be harder to stream in a real time environment and
+batch processes, and will be harder to stream in a real-time environment and
 involves large setup and shutdown delays. We have been looking at tools such as
-Spark, Storm, and Apache S4 in the hopes of finding a streamable distributed
-tool for better real-time updates while still keeping Hadoop's ease of use and
-fault tolerance.
+Apache Spark, Twitter Storm, and Apache S4 in the hopes of finding a streamable
+distributed tool for better real-time updates while still keeping Hadoop's ease
+of use and fault tolerance.
 
-A summary of Summingbird, a tool recently manufactured by Twitter for compiling
-map reduce problems into either batch or real-time processes, outlines some of
-the tradeoffs and problems we will face with this choice. Although Storm
-(another of their tools) is faster and streamable, It sacrifices the fault
-tolerance of Hadoop's implementation as well as having different problems and
-bugs we will have to learn and deal with.\cite{TwitterSummingbird}
+We investigated Summingbird, a tool recently released by Twitter, for making our
+data processing more real-time. Summingbird is a framework that runs on top of
+Storm that can turn MapReduce jobs into either batch or real-time processes.
+However, this tool inherits some of the tradeoffs inherent in Storm; although
+Storm is fast and streamable, not only does it sacrifice fault tolerance, but it
+is also a relatively new and immature framework.\cite{TwitterSummingbird}
 
-Using information from Spark's official webpage\cite{ApacheSpark}, we can see
-some touted benefits for their system. They mention that their tool can be up to
-100x faster than Hadoop implementations by using in memory computations. This
-could lead to its own problems as well though. So, although we are unsure of
-which to use, we will most likely start with the system we are most familiar
-with (Hadoop) and then prototype the system using the other options so we may
+In addition, we explored using Apache Spark. This tool can be up to 100x faster
+than Hadoop implementations by using in memory computations. Of course, this has
+its own tradeoffs as well though.\cite{ApacheSpark} Although we are unsure of
+which tool to use, we will most likely begin with Hadoop, with which we are most
+familiar, and then prototype the system using the alternative tools so we can
 compare the benefits and tradeoffs ourselves. This way, if one does not work, or
 any is clearly better than the others, we will be able to identify it, learn it,
 and use it.
 
 \subsection{Evaluation criteria}
 
-Our main criteria for evaluation include ease of usability and the ability to
-access important information on our software. We want someone with minimal
+Our main criteria for evaluation include ease of use and the ability to readily
+understand important information on our software. We want someone with minimal
 knowledge of the specific network, or even networks in general, to be able to
 use the tool and still understand what we are portraying. We also of course want
 the tool to be useful for knowledgeable users. Our program should be able to
@@ -344,14 +341,13 @@ addition to this, we are also focusing on the visual and interactive components
 of the project to try and streamline the user experience.
 
 We also hope that our program will be able to detect and display anomalies to
-its users. If we are able to detect attacks or abnormalities in usage in real
+its users. If we are able to detect attacks or abnormalities in usage in real-
 time, that alone would constitute a success for the software. The ultimate point
 of validation though would be to see Penn's network administrators (or the
-administrators of another network) use the software and value it higher than
-what they currently use. Our end goal is to create an extensive tool for
-displaying detailed and informative network information with a highly user
-experience centric front end as we think this technology is currently
-unavailable.
+administrators of another network) use the software and value it more highly
+than what they currently use. Our end goal is to create an extensive tool for
+displaying detailed and informative network information with an easy-to-use
+front end.
 
 \section{Timetable}
 
@@ -359,7 +355,7 @@ While it is difficult to predict with certainty all obstacles we will encounter
 in course of the project, we have laid out our preliminary timetable as follows:
 
 \begin{enumerate}
-    \item \textsc{October}: Receive LDDP, SNMP Data from Penn. Process it to
+    \item \textsc{October}: Receive LLDP, SNMP Data from Penn. Process it to
         JSON-based graphs.
     \item \textsc{November}: Write LLDP- and SNMP-crunching jobs with MapReduce.
     \item \textsc{December}: Create basic front-end to display node format.
@@ -379,7 +375,5 @@ network activity.
 
 \bibliographystyle{plain}
 \bibliography{sources}
-
-\nocite{*}
 
 \end{document}
