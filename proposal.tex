@@ -18,14 +18,15 @@
 \section*{Abstract}
 
 We propose to create a tool to help Penn system administrators better understand
-the health and security of a network.  Current networking protocols and tools
-present data in a way that is too disaggregated and computer-driven to
+the health and security of their network.  Current networking protocols and
+tools present data in a way that is too disaggregated and computer-driven to
 understand. We plan to leverage LLDP (Link-Layer Discovery Protocol), SNMP
-(Simple Network Management Protocol), as well as NetFlow as data sources. In
-order to more effectively visualize and analyze the data, we plan to use modern
-web technologies such as MapReduce for real-time large computation, as well as
-node.js in order to asynchronously update data between the server processing
-network data and the client displaying it.
+(Simple Network Management Protocol), as well as NetFlow (packet metadata
+inspection) as data sources. In order to more effectively visualize and analyze
+the data, we plan to use modern web technologies such as MapReduce for
+real-time, large-scale computation, as well as node.js in order to
+asynchronously update data between the server processing network data and the
+client displaying it.
 
 Our product will differentiate itself on three primary attributes: real-time
 analytics enabled through distributed computation, cross-platform compatibility
@@ -63,10 +64,10 @@ machine where it can be stored, exported, and/or used for analysis.
 Many IT professionals are required to perform analysis of a computer network to
 discover information such as percentage of traffic used by certain applications,
 which users use the network the most, how usage patterns have changed over time,
-and the geographic patterns of network connections. The usage of LLDP, SNMP, and
-Netflow data has emerged as a method to perform this analysis and tools such as
-NFSen have enabled visualization capabilities by enabling users to look at the
-data in a variety of forms such as logs, charts, and graphs.
+and the geographic patterns of network connections. LLDP, SNMP, and Netflow data
+have emerged as a protocols to perform this analysis and tools such as NFSen
+have enabled visualization capabilities by enabling users to look at the data in
+a variety of forms such as logs, charts, and graphs.
 
 We believe that existing tools can be improved upon. Log files give extremely
 granular detail that provides rich information, but can be overwhelming for a
@@ -88,24 +89,26 @@ and multi-platform.
 
 \section{Related work}
 
-Much research has been done into the utilization of NetFlow for network analysis
-and visualization, and there are a variety of open- and closed-source tools
-available. The same applies for SNMP and LLDP tools. In fact, LLDP is
+Much software has been written to improve the utilization of NetFlow for network
+analysis and visualization, and there are a variety of open- and closed-source
+tools available. The same applies for SNMP and LLDP tools. In fact, LLDP is
 specifically designed in order to provide information on the topology of a
 network, the very thing that we want to first build out, but we find that the
 tools are widely disaggregated, and often unintuitive to use. For example, LLDP
-is a command line based tools, such that the results output is completely
+is a command line based tool, so that the results output is completely
 text-based, and even after reading manuals, it was difficult to understand the
-output. One of the best software packages we found was ``solarwinds,'' which is
-a very expensive NetFlow analysis package, which breaks down network nodes in
-tree form, on a map, by CPU usage, node health, and other metrics. We found that
-it was a great way to diagnose potential problems with the network, but based on
+output.
+
+One of the best software packages we found was solarwinds, which is a very
+expensive NetFlow analysis package, which breaks down network nodes in tree
+form, on a map, by CPU usage, node health, and other metrics. We found that it
+was a great way to diagnose potential problems with the network, but based on
 our test of the free trial, were unable to find out the exact problem. The user
 interface was also somewhat confusing: the relationship between different
 metrics and graphs was not highlighted. In addition, it appears that LLDP and
 SNMP were not incorporated into the solarwinds software; we believe that by
 integrating multiple data sets, we can provide a more holistic picture of
-network health. 
+network health.
 
 Another tool we looked into was nfsen, an open-source web-based NetFlow
 aggregator and analyzer. It took raw NetFlow data from another open-source tool,
@@ -115,6 +118,55 @@ anything other than knowing there was a problem. We spoke with the Penn system
 administrators, and they found nfsen to be useful only in detecting potential
 anomalies. From there, they used command tools and sometimes a multitude of
 other software platforms in order to understand the problem in detail.
+
+Work by Minarik and Dymacek\cite{Minarik08} demonstrated a clear understanding
+of the need for system administrators to be able to intuitively understand a
+problem using a graph-based, high-level examination, then to drill down on those
+nodes and understand statistics for those nodes in order to further
+investigate.They even included programmatic DNS, port, and WHOIS lookups in
+order to reduce the mechanical work of an analyst, but we found that they didn’t
+use LDDP or SNMP in order to create and understand topology, and their user
+interface looked like it could use some improvement as the usage case was not
+entirely intuitive.
+
+In terms of work to understand campus wireless networks, we found that Kotz et
+al.\cite{Kotz05} used SNMP in order to understand macro-scale campus networks
+as wireless was emerging in 2005. Although the research primarily investigated
+roaming across the network, which is not entirely relevant to our proposed work,
+their method of breaking down traffic across the network using SNMP is relevant.
+The researchers polled their access points every 5 minutes using the SNMP
+software installed across the network, and got inbound/outbound byte counts as
+well as recent MAC addresses. From there, they were able to graph out traffic
+over the course of an average day as well as traffic patterns over a long period
+of time.
+
+Yin et al.\cite{Yin04} developed a tool called VisFlowConnect which is a
+visualization tool that uses a parallel axes representation of Netflow to help
+users visualize network traffic. The development of VisFlowConnect was motivated
+by the insufficiency of traditional tools to present hostile attack patterns in
+an intuitive way for the human mind.  VisFlowConnect has various features that
+have served as inspiration for our project, including interface views of
+different granularity (e.g. global, intra-network) and filtering of data on
+various parameters (e.g. protocol, packet-size). However, a shortcoming of
+VisFlowConnect is the inability to drill down on the flow data and not only
+filter on, but observe information such as protocol and transfer rate. In
+addition, we feel that a parallel axes representation of the network can be
+somewhat overwhelming and unintuitive and that a graph representation would be
+better.
+
+Ball et al.\cite{Ball04} developed a tool called Visual Information Security
+Utility for Administration Live (VISUAL) which allows users to see communication
+patterns between internal networks and external hosts in a graphical
+representation.  After surveying IT professionals, Ball, Fink, and North found
+that users found it difficult to quickly assess the security state of networks
+with text-based tools. They found that with VISUAL, users could develop insights
+from the traffic data without any training, demonstrating the power of
+visualization tools. VISUAL's main features include markers for external and
+internal hosts, color-coded links between external and internal hosts,
+interactive filtering, and time lines. Shortcomings of VISUAL that we hope to
+address include more proactive displays (e.g. having an internal host flash red
+when there's a traffic spike) and processing network data in closer to
+real-time.
 
 \section{Proposed work}
 
