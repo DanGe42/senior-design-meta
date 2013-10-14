@@ -182,17 +182,16 @@ real-time.
 
 \subsection{Overview}
 
-The point of our project is to create a system which will be able to analyze
-network data, not only in an aggregation fashion, but also in terms of
-extrapolation. In addition, we aim to display the network data in a user
-friendly, yet descriptive way. The architecture of the application can be broken
-down into 3 main components. First, we will have a module that collects and
-stores data from a network. Second, this data will be passed to the cloud to be
-processed and interpreted. Third, the calculated statistics and information will
-be displayed on a clean, interactive web front end. The end goal is to run our
-system on the constant stream of information provided by a living network, and
-we hope to make the system real-time, or as close to real-time as is possible
-using our tools.
+Our objective is to create a system which will be able to analyze network data,
+not only in an aggregation fashion, but also in terms of extrapolation. In
+addition, we aim to display the network data in a user friendly, yet descriptive
+way. The architecture of the application can be broken down into 3 main
+components. First, we will have a module that collects and stores data from a
+network. Second, this data will be passed to the cloud to be processed and
+interpreted. Third, the calculated statistics and information will be displayed
+on a clean, interactive web front end. The end goal is to run our system on the
+constant stream of information provided by a living network, and we hope to make
+the system real-time, or as close to real-time as is possible using our tools.
 
 \begin{figure}[htb!]
     \centering
@@ -236,12 +235,12 @@ possible use of stylesheets.
 In order to coordinate the transfer of the data (collector to big data
 processor, database to server), it is necessary to use scheduler scripts. For
 the initial implementation it would make sense to have a cron job (period job
-scheduler) that runs on a EC2 instance that fires up instances for Map Reduce
+scheduler) that runs on a EC2 instance that fires up instances for MapReduce
 jobs (or another distributed data processing system) and a cron job running on
 the network data collector that schedules times for sending network data to a S3
 bucket. Later on we look to add synchronization with a fault tolerant job
 scheduler if this application scales out to more nodes. Chronos is a possible
-tool for distributed and fault tolerant job scheduling.
+tool for distributed and fault tolerant job scheduling.\cite{AirbnbChronos}
 
 \subsection{Anticipated technical challenges}
 
@@ -269,6 +268,24 @@ run out of memory and stop streaming. It is essential to identify these errors
 as they occur and to automatically recover from them or to fail gracefully and
 not let errors further propagate.
 
+The proposed implementation also has potential performance bottlenecks at
+multiple stages of the data transfer. To maintain the real-time nature of the
+application, we must address them. One anticipated bottleneck in the current
+architecture is the single collector node we have in the Penn Engineering
+network. If there is only one node that collects all of the LLDP data within the
+Penn network then it will be under much stress due to the high volume. One
+potential solution would be to set up a distributed cluster of network data
+collectors. Details of this data collection depend on the input of the Penn
+Engineering network administrators. Additionally this same node (or nodes) will
+be transferring data to AWS over the internet. Transferring a high volume of
+data over the internet has the potential to take a very long time. This can be
+mitigated by bringing the data processors as close the the collector as
+possible. AWS hosts its services in Virginia so the distance is relatively
+close. If we want to limit network latency then that would entail setting up a
+data processing cluster on campus. This too will have to be discussed with the
+network administrators. More details about bottlenecks in the application will
+surface as we dive deeper into the implementation.
+
 We are also unsure on what software to use specifically for our cloud analysis.
 Within our team, Hadoop is the best known tool at this time. But Hadoop runs
 batch processes, and will be harder to stream in a real time environment and
@@ -282,33 +299,38 @@ map reduce problems into either batch or real-time processes, outlines some of
 the tradeoffs and problems we will face with this choice. Although Storm
 (another of their tools) is faster and streamable, It sacrifices the fault
 tolerance of Hadoop's implementation as well as having different problems and
-bugs we will have to learn and deal with.
+bugs we will have to learn and deal with.\cite{TwitterSummingbird}
 
-Using information from Spark's official webpage, we can see some touted benefits
-for their system. They mention that their tool can be up to 100x faster than
-Hadoop implementations by using in memory computations. This could lead to its
-own problems as well though. So, although we are unsure of which to use, we will
-most likely start with the system we are most familiar with (Hadoop) and then
-prototype the system using the other options so we may compare the benefits and
-tradeoffs ourselves. This way, if one does not work, or any is clearly better
-than the others, we will be able to identify it, learn it, and use it.
+Using information from Spark's official webpage\cite{ApacheSpark}, we can see
+some touted benefits for their system. They mention that their tool can be up to
+100x faster than Hadoop implementations by using in memory computations. This
+could lead to its own problems as well though. So, although we are unsure of
+which to use, we will most likely start with the system we are most familiar
+with (Hadoop) and then prototype the system using the other options so we may
+compare the benefits and tradeoffs ourselves. This way, if one does not work, or
+any is clearly better than the others, we will be able to identify it, learn it,
+and use it.
 
 \subsection{Evaluation criteria}
 
-Our main criteria for evaluation involve the ease of usability and the ability
-to access important information on our software. We want someone with minimal
+Our main criteria for evaluation include ease of usability and the ability to
+access important information on our software. We want someone with minimal
 knowledge of the specific network, or even networks in general, to be able to
 use the tool and still understand what we are portraying. We also of course want
 the tool to be useful for knowledgeable users. Our program should be able to
-display the same information as other applications on the market plus some in
-addition to its visual components.
+display the same information as other applications on the market plus some. In
+addition to this, we are also focusing on the visual and interactive components
+of the project to try and streamline the user experience.
 
 We also hope that our program will be able to detect and display anomalies to
-its users. The ultimate point of validation would be to see Penn's network
-administrators (or the administrators of another network) use the software and
-value it higher than what they currently use. Our end goal is to create an
-extensive tool for displaying network information with a highly user experience
-centric front end as we think this technology is currently unavailable.
+its users. If we are able to detect attacks or abnormalities in usage in real
+time, that alone would constitute a success for the software. The ultimate point
+of validation though would be to see Penn’s network administrators (or the
+administrators of another network) use the software and value it higher than
+what they currently use. Our end goal is to create an extensive tool for
+displaying detailed and informative network information with a highly user
+experience centric front end as we think this technology is currently
+unavailable.
 
 \section{Timetable}
 
