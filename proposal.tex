@@ -35,6 +35,29 @@ create a tool to allow administrators to quickly understand problems at a macro
 level, then to easily drill down and display potential problems at the component
 level to speed the manual network diagnostics process.
 
+\section*{Glossary}
+
+\textbf{Link Layer Discovery Protocol (LLDP)} is a protocol used to discover the
+topology of a network. This protocol allows Ethernet devices such as routers and
+bridges to broadcast information about themselves such as capabilities and
+neighbors, as well as receive this information from other devices.  Ethernet
+devices broadcast information about themselves, store information they learn
+about each other in local databases, and a network management system accesses
+this data to build a map of the network topology. The basic unit of data
+transmitted by this protocol is a LLDP Protocol Data Unit (PDU). A LLDP PDU
+consists of a header followed by elements known as TLVs (Type, Length, Value).
+
+\textbf{NetFlow} is a protocol used for collecting and analyzing network
+traffic. On a high level, a flow is a series of packets that are similar to each
+other. More specifically, we will be working with Cisco's Version 5 and Version
+9 flow records where a flow is defined by source IP address, destination IP
+address, source port number, destination port number, layer 3 protocol type, ToS
+byte, and input logical interface. Each flow consists of a flow header, which
+contains information such as Netflow version and number of records, and flow
+records, which contains information such as source and destination IP, bytes,
+and IP protocol. Netflow is sent from routers and switches to a collector
+machine where it can be stored, exported, and/or used for analysis.
+
 \section{Introduction}
 
 Many IT professionals are required to perform analysis of a computer network to
@@ -62,30 +85,6 @@ we will also incorporate event detection to detect events such as traffic spikes
 and security threats to make our system proactive. These capabilities will be
 enhanced by performing the analysis in real-time and making our system web-based
 and multi-platform.
-
-\subsection{Definitions}
-
-\textbf{Link Layer Discovery Protocol (LLDP)} is a protocol used to discover the
-topology of a network. This protocol allows Ethernet devices such as routers and
-bridges to broadcast information about themselves such as capabilities and
-neighbors, as well as receive this information from other devices.  Ethernet
-devices broadcast information about themselves, store information they learn
-about each other in local databases, and a network management system accesses
-this data to build a map of the network topology. The basic unit of data
-transmitted by this protocol is a LLDP Protocol Data Unit (PDU). A LLDP PDU
-consists of a header followed by elements known as TLVs (Type, Length, Value).
-
-Another form of data that our project will be collecting and analyzing is
-\textbf{Netflow}. On a high level, a flow is a series of packets that are
-similar to each other. More specifically, we will be working with Cisco's
-Version 5 and Version 9 flow records where a flow is defined by source IP
-address, destination IP address, source port number, destination port number,
-layer 3 protocol type, ToS byte, and input logical interface. Each flow consists
-of a flow header, which contains information such as Netflow version and number
-of records, and flow records, which contains information such as source and
-destination IP, bytes, and IP protocol. Netflow is sent from routers and
-switches to a collector machine where it can be stored, exported, and/or used
-for analysis.
 
 \section{Related work}
 
