@@ -245,7 +245,27 @@ tool for distributed and fault tolerant job scheduling.\cite{AirbnbChronos}
 
 \subsection{Anticipated technical challenges}
 
-The first challenge we anticipate is simply the sheer volume of the data we must
+The first challenge we anticipate involves data privacy. Our software aims to
+examine a large amount of data from Penn's network and to make the data easy to
+understand for system administrators. Having a large volume of this kind of data
+makes it easy for anyone with access to it to identify specific users and
+determine how they are using the network. Thus, privacy is a foremost concern in
+our project. This is a two-pronged problem: we need to prevent both ourselves
+and system administrators from violating user privacy.
+
+Building the software requires us to heavily examine user-identifying NetFlow
+data, and we need to anonymize the NetFlow records before we look at them to
+prevent abuse. One approach we will take to anonymize these records is to use
+pre-existing software to hash IPs and hostnames so that we cannot determine how
+specific users are using the network. In addition, because our software makes
+network data easy to understand at a glance for system administrators, we also
+need to have safeguards to prevent data abuse from within our software. To
+prevent snooping, our software will log the actions sysadmins take on our
+software, such as logging in and looking up activity at a particular node, for
+privacy audits. And because sysadmins will know that their actions are being
+logged, they will be much less tempted to abuse our software.
+
+The next challenge we anticipate is simply the sheer volume of the data we must
 aggregate and send to the cloud. This volume could easily reach the scale of
 terabytes if collected for long enough. We will devise a way to take this volume
 of data and stream it to the processing cluster in the cloud. Transferring this
