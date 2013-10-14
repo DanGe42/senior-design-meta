@@ -3,6 +3,8 @@
 *.blg
 *.log
 *.pdf
+*.out
+*.dvi
 
 # OS stuff
 .DS_Store
