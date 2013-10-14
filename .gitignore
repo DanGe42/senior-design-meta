@@ -3,3 +3,7 @@
 *.blg
 *.log
 *.pdf
+
+# OS stuff
+.DS_Store
+thumbs.db
