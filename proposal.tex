@@ -43,22 +43,23 @@ level to speed the manual network diagnostics process.
 layout of a network.\cite{ExtremeNetLldp} This protocol allows Ethernet devices
 such as routers and bridges to broadcast information about themselves such as
 capabilities and neighbors, as well as receive this information from other
-devices. Devices broadcast information about themselves, store information they
-learn about each other in local databases, and a network management system
-accesses this data to build a map of the network topology. The basic unit of
-data transmitted by this protocol is a LDP Protocol Data Unit (PDU). A LLDP PDU
-consists of a header followed by elements known as TLVs (Type, Length, Value).
+devices. Devices broadcast information about themselves and store information
+they learn about each other in local databases, allowing network management
+systems access to this data to build a map of the network topology. The basic
+unit of data transmitted by this protocol is a LDP Protocol Data Unit (PDU). A
+LLDP PDU consists of a header followed by elements known as TLVs (Type, Length,
+Value).
 
-\textbf{Netflow} is a protocol used for collecting IP
-traffic information.\cite{SolarWindsGuide} On a high level, a flow is a series
-of packets that are similar to each other. More specifically, Cisco's Version 5
-and Version 9 flow records define a flow by source IP address, destination IP
+\textbf{NetFlow} is a protocol used for collecting IP traffic
+information.\cite{SolarWindsGuide} On a high level, a flow is a series of
+packets that are similar to each other. More specifically, Cisco's Version 5 and
+Version 9 flow records define a flow by source IP address, destination IP
 address, source port number, destination port number, layer 3 protocol type, ToS
 byte, and input logical interface. Each flow consists of a flow header, which
-contains information such as Netflow version and number of records, and flow
+contains information such as NetFlow version and number of records, and flow
 records, which contains information such as source and destination IP, bytes,
-and IP protocol. Netflow is sent from routers and switches to a collector
-machine where it can be stored, exported, and/or used for analysis.
+and IP protocol. NetFlow records are sent from routers and switches to a
+collector machine where it can be stored, exported, and/or used for analysis.
 
 \textbf{Simple Network Management Protocol (SNMP)} is a protocol that helps
 exchange information about a network between the devices in the
@@ -76,7 +77,7 @@ Many IT professionals are required to perform analysis of a computer network to
 discover information such as percentage of traffic used by certain applications,
 which users use the network the most, how usage patterns have changed over time,
 and the geographic patterns of network connections. The usage of LLDP, SNMP, and
-Netflow data has emerged as a method to perform this analysis and tools such as
+NetFlow data has emerged as a method to perform this analysis and tools such as
 NfSen have enabled visualization capabilities by enabling users to look at the
 data in a variety of forms such as logs, charts, and graphs.
 
@@ -151,7 +152,7 @@ over the course of an average day as well as traffic patterns over a long period
 of time.
 
 Yin et al.\cite{Yin04} developed a tool called VisFlowConnect which is a
-visualization tool that uses a parallel axes representation of Netflow to help
+visualization tool that uses a parallel axes representation of NetFlow to help
 users visualize network traffic. The development of VisFlowConnect was motivated
 by the insufficiency of traditional tools to present hostile attack patterns in
 an intuitive way for the human mind. VisFlowConnect has various features that
@@ -202,7 +203,7 @@ close to real-time as is possible using our tools.
 \subsection{Techniques}
 
 We will collect LLDP data, information from SNMP, and hopefully (time
-permitting) Netflow data from the Penn Engineering network. This information
+permitting) NetFlow data from the Penn Engineering network. This information
 must then be transferred to our data processing tools in the cloud. For this to
 be possible, we must move the data to a cloud storage base (such as S3 on AWS)
 in order to use a horizontally scalable data processing system to extract
@@ -269,7 +270,7 @@ terabytes if collected for long enough. We will devise a way to take this volume
 of data and stream it to the processing cluster in the cloud. Transferring this
 high volume of data to a cloud service could be potentially costly so we will
 need to consider ways to keep this cost low and transfer the data efficiently.
-Additionally, If we reach the point where we work with Netflow data we must
+Additionally, If we reach the point where we work with NetFlow data we must
 address security and privacy concerns with this collection. Most likely we will
 need to anonymize the network data before we send it over to the data processor.
 
@@ -341,9 +342,9 @@ addition to this, we are also focusing on the visual and interactive components
 of the project to try and streamline the user experience.
 
 We also hope that our program will be able to detect and display anomalies to
-its users. If we are able to detect attacks or abnormalities in usage in real-
-time, that alone would constitute a success for the software. The ultimate point
-of validation though would be to see Penn's network administrators (or the
+its users. If we are able to detect attacks or abnormalities in usage in
+real-time, that alone would constitute a success for the software. The ultimate
+point of validation though would be to see Penn's network administrators (or the
 administrators of another network) use the software and value it more highly
 than what they currently use. Our end goal is to create an extensive tool for
 displaying detailed and informative network information with an easy-to-use
@@ -361,7 +362,7 @@ in course of the project, we have laid out our preliminary timetable as follows:
     \item \textsc{December}: Create basic front-end to display node format.
     \item \textsc{January}: Prototype of router node graph and basic statistics
         implemented for Penn.
-    \item \textsc{February}: Receive anonymized Netflow data from Penn,
+    \item \textsc{February}: Receive anonymized NetFlow data from Penn,
         determine analysis algorithms.
     \item \textsc{March}: Convert analysis algorithms into MapReduce jobs,
         combine with front-end.
